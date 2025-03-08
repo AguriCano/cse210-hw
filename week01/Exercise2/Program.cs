@@ -62,7 +62,7 @@ class Program
         // Display final grade
         Console.WriteLine($"Your letter grade is: {letter}{sign}");
         
-        // Determine pass/fail
+        // Message
         if (grade >= 70)
         {
             Console.WriteLine("Congratulations! You passed the course.");
