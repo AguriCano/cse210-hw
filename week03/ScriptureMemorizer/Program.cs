@@ -1,59 +1,100 @@
 using System;
-using System.Collections.Generic;
-using System.IO;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+
+
 
 class Program
 {
     static void Main(string[] args)
     {
-        // Load scriptures from file or predefined list
-        List<Scripture> scriptureLibrary = LoadScripturesFromFile("scriptures.txt");
+        // This will clear the console
+        Console.Clear();
+        Reference reference = new Reference();
+        reference.LoadReference();
+        Scripture scripture = new Scripture();
+        scripture.LoadScriptures();
+        Word word = new Word();
 
-        // Check if the library is empty
-        if (scriptureLibrary.Count == 0)
+        Console.Write("\n**** Welcome to the Scripture Memorizer App ****\n");
+
+        int userChoice = 0;
+
+        while (userChoice != 3)
         {
-            Console.WriteLine("No scriptures found in the library.");
-            return;
-        }
+            // Ask for user input (1,2,Q)
+            //Call UserChoice
+            userChoice = UserChoice();
 
-        // Choose a random scripture from the list
-        Random rand = new Random();
-        int randomIndex = rand.Next(scriptureLibrary.Count);
-
-        // Select the scripture at the random index
-        Scripture scripture = scriptureLibrary[randomIndex];
-
-        // Start the memorization process
-        scripture.StartMemorization();
-    }
-
-    // Method to load scriptures from a file
-    static List<Scripture> LoadScripturesFromFile(string fileName)
-    {
-        List<Scripture> scriptures = new List<Scripture>();
-        try
-        {
-            foreach (var line in File.ReadLines(fileName))
+            switch (userChoice)
             {
-                // Split the reference and text based on the first space
-                string[] parts = line.Split(new char[] { ' ' }, 2);
-                if (parts.Length == 2)
-                {
-                    // Create a Reference object and a Scripture object
-                    string[] referenceParts = parts[0].Split(':');
-                    if (referenceParts.Length == 2)
+                case 1:
+                    reference.ReferenceDisplay();
+
+                    break;
+                case 2:
+                    string script = scripture.RandomScripture();
+                    string ref1 = reference.GetReference(scripture);
+                    word.GetRenderedText(scripture);
+                    word.GetRenderedRef(scripture);
+
+                    while (word._hidden.Count < word._result.Length)
                     {
-                        int chapter = int.Parse(referenceParts[0]);
-                        int verseStart = int.Parse(referenceParts[1]);
-                        scriptures.Add(new Scripture(new Reference(parts[0], chapter, verseStart), parts[1]));
+                        word.Show(ref1);
+                        word.GetReadKey();
                     }
-                }
+                    word.Show(ref1);
+                    break;
+                case 3:
+                    Console.WriteLine("\n*** Thanks for playing! ***\n");
+                    break;
+                default:
+                    Console.WriteLine($"\nSorry the option you entered is not valid.");
+                    break;
             }
         }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error loading scriptures: {ex.Message}");
-        }
-        return scriptures;
+
     }
+
+    static int UserChoice()
+    // Method to display choices to user
+    {
+        Reference reference = new Reference();
+
+        string choices = $@"
+===========================================
+Please select one of the following choices:
+1. Display all availble scriptures references
+2. Randomly select scripture to work on
+Q. Quit
+===========================================
+What would you like to do?  ";
+
+        Console.Write(choices);
+
+        string userInput = Console.ReadLine();
+        userInput.ToLower();
+        int userChoice = 0;
+        // This block catches any non integer values that are entered
+        try
+        {
+            if (userInput == "q")
+            {
+                userInput = "3";
+            }
+            userChoice = int.Parse(userInput);
+        }
+        catch (FormatException)
+        {
+            userChoice = 0;
+        }
+        catch (Exception exception)
+        {
+            Console.WriteLine(
+                $"Unexpected error:  {exception.Message}");
+        }
+        return userChoice;
+    }
+
+
 }

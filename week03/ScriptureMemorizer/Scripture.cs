@@ -1,87 +1,70 @@
 using System;
-using System.Collections.Generic;
 
 public class Scripture
 {
-    private Reference _reference;
+    // Variables
+    public List<Scripture> _scripture = new List<Scripture>();
+    private string _fileName = "scriptures.txt";
+    private string _key;
     private string _text;
-    private List<Word> _words;
-    private int _memorizedCount;
+    public int _index;
+    public string _scriptureText;
 
-    // Constructor to initialize scripture with reference and text
-    public Scripture(Reference reference, string text)
+
+    // Methods
+    public void LoadScriptures()
     {
-        _reference = reference;
-        _text = text;
-        _words = new List<Word>();
-        _memorizedCount = 0;
+        List<string> readText = File.ReadAllLines(_fileName).Where(arg => !string.IsNullOrWhiteSpace(arg)).ToList();
 
-        foreach (string word in _text.Split(' '))
+        foreach (string line in readText)
         {
-            _words.Add(new Word(word));
+            string[] entries = line.Split(";");
+
+            Scripture entry = new Scripture();
+
+            entry._key = entries[0];
+            entry._text = entries[6];
+
+            _scripture.Add(entry);
         }
     }
 
-    // Method to display the scripture with the reference and words
-    public void DisplayScripture()
+    public void ScriptureDisplay()
     {
-        Console.Clear();
-        Console.WriteLine($"{_reference.Display()}");
-
-        // Show words and how many words are memorized
-        foreach (var word in _words)
+        foreach (Scripture item in _scripture)
         {
-            Console.Write(word.Display() + " ");
-        }
-
-        Console.WriteLine($"\n\nWords memorized: {_memorizedCount} / {_words.Count}");
-    }
-
-    // Method to hide a random word that has not been hidden yet
-    public void HideRandomWords()
-    {
-        // Filter out words that are not hidden
-        List<Word> visibleWords = _words.FindAll(word => !word.IsHidden());
-
-        if (visibleWords.Count > 0)
-        {
-            // Select a random visible word
-            Random rand = new Random();
-            int index = rand.Next(visibleWords.Count);
-            visibleWords[index].Hide();
-            _memorizedCount++;  // Increase memorized word count
+            item.ShowScripture();
         }
     }
-
-    // Method to start the memorization process
-    public void StartMemorization()
+    public void ShowScripture()
     {
-        bool allHidden = false;
-        while (!allHidden)
-        {
-            // Display the scripture
-            DisplayScripture();
-
-            // Ask the user to press Enter to hide more words or type 'quit' to exit
-            Console.WriteLine("Press Enter to hide more words or type 'quit' to exit.");
-            string input = Console.ReadLine();
-            if (input.ToLower() == "quit")
-            {
-                allHidden = true;
-            }
-            else
-            {
-                // Hide a random visible word
-                HideRandomWords();
-
-                // Check if all words are hidden
-                allHidden = _words.TrueForAll(word => word.IsHidden());
-            }
-        }
-
-        // Display the final scripture with all words hidden
-        DisplayScripture();
-        Console.WriteLine("All words are now hidden. Press any key to exit.");
-        Console.ReadKey();
+        Console.WriteLine($"\n{_text}");
     }
+
+    public int GetRandomIndex()
+    {
+        var random = new Random();
+        _index = random.Next(_scripture.Count);
+        return _index;
+    }
+
+    public string RandomScripture()
+    {
+        _index = GetRandomIndex();
+       return _scriptureText = _scripture[_index]._text;
+    }
+    public void HideWords()
+    {
+
+    }
+    public void GetRenderedText()
+    {
+
+    }
+    public void IsCompletelyHidden()
+    {
+
+    }
+
+
 }
